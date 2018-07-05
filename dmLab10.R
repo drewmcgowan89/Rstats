@@ -1,5 +1,5 @@
 mat<-read.csv("trout.maturity.csv")
-head(mat)       #Response is maturity (binary, i.e., binomial with n = 1)
+head(mat)       #Response is maturity
 #Length is continuous predictor (in mm)
 attach(mat)
 levels(Sex:Species)  #Sex and Species are categorical predictors that define four groups
@@ -61,27 +61,3 @@ plot(L,1/(1+exp(-(B0+B1*L))),type="l",ylab="Probability of maturity",xlab="Lengt
 legend("topleft",c("RHT Females","RHT Males", "YCT Females","YCT Males"),lty=1:4)
 
 
-####
-#2
-ext<-read.csv("extinction.csv")
-head(ext)  #Response is number of species extinctions vs. area of island
-
-attach(ext)
-Resp<-as.matrix(ext[,1:2]) 
-extmod<-glm(Resp~log(Area),family=binomial(link="logit"))
-summary(extmod)
-
-
-B0<-extmod$coef[[1]]
-B1<-extmod$coef[[2]]
-
-siga<-vcov(extmod)
-jac1<-matrix(c(-1/B1,-B0*B1,0,exp(B1)),nrow=2,ncol=2,byrow=T)
-jac2<-matrix(c(-exp(B0/B1),-1,0,1),nrow=2,ncol=2,byrow=T)
-vcov1<-jac2%*%jac1%*%siga%*%t(jac1)%*%t(jac2)
-vcov1
-#b
-devtab<-anova(extmod)
-
-(LRTstat<-devtab$Deviance[[2]])
-pchisq(LRTstat,df=1,lower.tail=F)
